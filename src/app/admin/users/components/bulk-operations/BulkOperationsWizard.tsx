@@ -101,6 +101,51 @@ export const BulkOperationsWizard: React.FC<BulkOperationsWizardProps> = ({
     setState(prev => ({ ...prev, ...updates }))
   }, [])
 
+  const handleExecute = useCallback(async () => {
+    if (!onExecute || !state.operationId) {
+      return
+    }
+    setLoading(true)
+    try {
+      const result = await onExecute(
+        state.operationId,
+        state.operationConfig,
+        state.selectedUserIds
+      )
+      updateState({ executionResult: result })
+      if (showAdvancedFeatures) {
+        goToStep(6)
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Execution failed'
+      setError(errorMsg)
+    } finally {
+      setLoading(false)
+    }
+  }, [onExecute, state.operationId, state.operationConfig, state.selectedUserIds, showAdvancedFeatures, goToStep, updateState])
+
+  const handleRollback = useCallback(async () => {
+    if (!onRollback || !state.operationId) {
+      return
+    }
+    setLoading(true)
+    try {
+      await onRollback(state.operationId)
+      setState({
+        step: 1,
+        selectedUserIds: [],
+        operationType: '',
+        operationConfig: {},
+        userFilter: {}
+      })
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Rollback failed'
+      setError(errorMsg)
+    } finally {
+      setLoading(false)
+    }
+  }, [onRollback, state.operationId])
+
   const renderStep = () => {
     switch (state.step) {
       case 1:
@@ -140,6 +185,13 @@ export const BulkOperationsWizard: React.FC<BulkOperationsWizardProps> = ({
             dryRunResults={state.dryRunResults}
             onDryRun={(results) => updateState({ dryRunResults: results })}
             onNext={nextStep}
+            onExecuteStart={() => {
+              const opId = `op-${Date.now()}`
+              updateState({ operationId: opId })
+              if (onExecute) {
+                handleExecute()
+              }
+            }}
           />
         )
       case 5:
@@ -148,9 +200,33 @@ export const BulkOperationsWizard: React.FC<BulkOperationsWizardProps> = ({
             tenantId={tenantId}
             operationId={state.operationId}
             progress={state.executionProgress}
-            onExecute={(id, progress) =>
+            onExecute={(id, progress) => {
               updateState({ operationId: id, executionProgress: progress })
-            }
+              if (showAdvancedFeatures && onExecute && state.executionResult) {
+                goToStep(6)
+              }
+            }}
+          />
+        )
+      case 6:
+        if (!showAdvancedFeatures || !state.executionResult) {
+          return null
+        }
+        return (
+          <CompletionStep
+            result={state.executionResult}
+            hasRollback={!!onRollback}
+            isRollingBack={loading}
+            onRollback={handleRollback}
+            onNewOperation={() => {
+              setState({
+                step: 1,
+                selectedUserIds: [],
+                operationType: '',
+                operationConfig: {},
+                userFilter: {}
+              })
+            }}
           />
         )
       default:
