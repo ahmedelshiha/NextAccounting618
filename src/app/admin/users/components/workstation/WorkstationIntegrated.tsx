@@ -59,9 +59,6 @@ export function WorkstationIntegrated({
   const workstationContext = useWorkstationContext()
   const { data: metricsData } = useDashboardMetrics()
 
-  // Local state for selected user dialog
-  const [selectedUser, setSelectedUser] = useState<UserItem | null>(null)
-  const [isUserDialogOpen, setIsUserDialogOpen] = useState(false)
 
   // Filter state from context
   const [filters, setFilters] = useState<UserFilters>(() => {
