@@ -208,11 +208,11 @@ describe('Phase 2: Workstation Integration Tests', () => {
         </WorkstationTestWrapper>
       )
 
-      // Verify saved view buttons are present
-      expect(screen.queryByText(/All Users|all users/i)).toBeInTheDocument()
-      expect(screen.queryByText(/Clients|clients/i)).toBeInTheDocument()
-      expect(screen.queryByText(/Team|team/i)).toBeInTheDocument()
-      expect(screen.queryByText(/Admins|admins/i)).toBeInTheDocument()
+      // Verify saved view buttons are present using data-testid
+      expect(screen.queryByTestId('view-btn-all')).toBeInTheDocument()
+      expect(screen.queryByTestId('view-btn-clients')).toBeInTheDocument()
+      expect(screen.queryByTestId('view-btn-team')).toBeInTheDocument()
+      expect(screen.queryByTestId('view-btn-admins')).toBeInTheDocument()
     })
 
     it('should apply role filter when saved view is clicked', async () => {
@@ -224,10 +224,10 @@ describe('Phase 2: Workstation Integration Tests', () => {
         </WorkstationTestWrapper>
       )
 
-      const clientsButton = screen.queryByRole('button', { name: /clients/i })
+      const clientsButton = screen.queryByTestId('view-btn-clients')
       if (clientsButton) {
         await user.click(clientsButton)
-        
+
         // URL should contain role filter
         await waitFor(() => {
           expect(window.location.search).toContain('role=CLIENT')
