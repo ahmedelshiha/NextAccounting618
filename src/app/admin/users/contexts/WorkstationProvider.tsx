@@ -68,10 +68,24 @@ export function WorkstationProvider({ children }: WorkstationProviderProps) {
     }
   }, [])
 
+  /**
+   * Refresh quick stats from API (Deferred to Phase 2.8 or Phase 3)
+   * TODO: Implement API call to fetch:
+   *   - totalUsers: Total user count
+   *   - activeUsers: Currently active user count
+   *   - pendingApprovals: Users awaiting approval
+   *   - inProgressWorkflows: Active workflows
+   * Expected endpoint: GET /api/admin/dashboard/quick-stats
+   * Dependencies: Needs filter context to apply user filters (optional)
+   */
   const refreshQuickStats = useCallback(async () => {
     setQuickStatsRefreshing(true)
     try {
-      // TODO: Fetch quick stats from API
+      // TODO: Replace with actual API call to fetch quick stats
+      // const response = await fetch('/api/admin/dashboard/quick-stats')
+      // const data = await response.json()
+      // setQuickStats(data)
+
       setQuickStats({
         ...defaultQuickStats,
         refreshedAt: new Date(),
