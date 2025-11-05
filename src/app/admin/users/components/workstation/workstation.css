@@ -210,7 +210,7 @@
 }
 
 .action-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.625rem 1rem;
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
@@ -219,6 +219,10 @@
   cursor: pointer;
   transition: opacity 0.2s ease;
   white-space: nowrap;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .action-btn:hover {
@@ -228,6 +232,11 @@
 .action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Metrics Grid */
