@@ -8,15 +8,13 @@ import { useWorkstationContext } from '../../contexts/WorkstationContext'
 import { useDashboardMetrics } from '../../hooks'
 import { WorkstationLayout } from './WorkstationLayout'
 import { WorkstationSidebar } from './WorkstationSidebar'
-import { WorkstationMainContent } from './WorkstationMainContent'
 import { WorkstationInsightsPanel } from './WorkstationInsightsPanel'
-import { AdvancedUserFilters, UserFilters } from '../AdvancedUserFilters'
+import type { UserFilters } from '../AdvancedUserFilters'
 import { UsersTable } from '../UsersTable'
 import { QuickActionsBar } from '../QuickActionsBar'
 import { OperationsOverviewCards } from '../OperationsOverviewCards'
 import { UserProfileDialog } from '../UserProfileDialog'
 import { toast } from 'sonner'
-import type { WorkstationMainContentProps } from '../../types/workstation'
 
 interface WorkstationIntegratedProps {
   users: UserItem[]
@@ -113,33 +111,26 @@ export function WorkstationIntegrated({
     handleFiltersChange(newFilters)
   }, [handleFiltersChange])
 
-  // Handle user selection for profile dialog
-  const handleSelectUser = useCallback((user: UserItem) => {
+  // Handle opening user profile dialog
+  const handleViewProfile = useCallback((user: UserItem) => {
     context.setSelectedUser(user)
     context.setProfileOpen(true)
   }, [context])
 
-  // Handle bulk user selection
-  const handleToggleUserSelection = useCallback((userId: string) => {
-    const newSelection = new Set(workstationContext.selectedUserIds)
-    if (newSelection.has(userId)) {
-      newSelection.delete(userId)
+  // Handle selection updates from table
+  const handleSelectUserSelection = useCallback((userId: string, selected: boolean) => {
+    const next = new Set(workstationContext.selectedUserIds)
+    if (selected) next.add(userId); else next.delete(userId)
+    workstationContext.setSelectedUserIds(next)
+  }, [workstationContext])
+
+  const handleSelectAll = useCallback((selected: boolean) => {
+    if (selected) {
+      workstationContext.setSelectedUserIds(new Set(users.map(u => u.id)))
     } else {
-      newSelection.add(userId)
+      workstationContext.setSelectedUserIds(new Set())
     }
-    workstationContext.setSelectedUserIds(newSelection)
-  }, [workstationContext])
-
-  // Handle select all users
-  const handleSelectAllUsers = useCallback(() => {
-    const allUserIds = new Set(users.map(u => u.id))
-    workstationContext.setSelectedUserIds(allUserIds)
   }, [users, workstationContext])
-
-  // Handle clear selection
-  const handleClearSelection = useCallback(() => {
-    workstationContext.setSelectedUserIds(new Set())
-  }, [workstationContext])
 
   // Apply bulk action
   const handleApplyBulkAction = useCallback(async () => {
@@ -151,7 +142,7 @@ export function WorkstationIntegrated({
     try {
       await workstationContext.applyBulkAction()
       toast.success('Bulk action applied successfully')
-      handleClearSelection()
+      workstationContext.setSelectedUserIds(new Set())
     } catch (error) {
       toast.error('Failed to apply bulk action')
       console.error('Bulk action error:', error)
@@ -174,7 +165,7 @@ export function WorkstationIntegrated({
     onFiltersChange: handleFiltersChange,
     stats,
     onAddUser,
-    onReset: () => handleFiltersChange({}),
+    onReset: () => handleFiltersChange({} as any),
   }
 
   // Memoized main content
@@ -210,11 +201,10 @@ export function WorkstationIntegrated({
             <UsersTable
               users={users}
               isLoading={isLoading}
+              onViewProfile={handleViewProfile}
               selectedUserIds={workstationContext.selectedUserIds}
-              onSelectUser={handleSelectUser}
-              onToggleUserSelection={handleToggleUserSelection}
-              onSelectAllUsers={handleSelectAllUsers}
-              onClearSelection={handleClearSelection}
+              onSelectUser={handleSelectUserSelection}
+              onSelectAll={handleSelectAll}
             />
           )}
         </div>
