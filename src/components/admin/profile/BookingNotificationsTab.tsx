@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiFetch } from '@/lib/api'
+import { useUserPreferences } from '@/hooks/useUserPreferences'
 
 interface BookingNotificationsData {
   bookingEmailConfirm: boolean
@@ -21,6 +21,7 @@ interface BookingNotificationsData {
 const REMINDER_HOURS = [24, 12, 6, 2]
 
 export default function BookingNotificationsTab({ loading }: { loading: boolean }) {
+  const { preferences, loading: preferencesLoading, error: preferencesError, updatePreferences, refetch } = useUserPreferences()
   const [saving, setSaving] = useState(false)
   const [data, setData] = useState<BookingNotificationsData>({
     bookingEmailConfirm: true,
@@ -32,51 +33,52 @@ export default function BookingNotificationsTab({ loading }: { loading: boolean 
     reminderHours: [24, 2],
   })
 
+  // Sync hook data to component state
   useEffect(() => {
-    loadPreferences()
-  }, [])
-
-  const loadPreferences = async () => {
-    try {
-      const res = await apiFetch('/api/user/preferences')
-      if (res.ok) {
-        const json = await res.json()
-        setData({
-          bookingEmailConfirm: json.bookingEmailConfirm ?? true,
-          bookingEmailReminder: json.bookingEmailReminder ?? true,
-          bookingEmailReschedule: json.bookingEmailReschedule ?? true,
-          bookingEmailCancellation: json.bookingEmailCancellation ?? true,
-          bookingSmsReminder: json.bookingSmsReminder ?? false,
-          bookingSmsConfirmation: json.bookingSmsConfirmation ?? false,
-          reminderHours: Array.isArray(json.reminderHours) ? json.reminderHours : [24, 2],
-        })
-      }
-    } catch (err) {
-      console.error('Failed to load preferences:', err)
+    if (preferences) {
+      setData({
+        bookingEmailConfirm: preferences.bookingEmailConfirm ?? true,
+        bookingEmailReminder: preferences.bookingEmailReminder ?? true,
+        bookingEmailReschedule: preferences.bookingEmailReschedule ?? true,
+        bookingEmailCancellation: preferences.bookingEmailCancellation ?? true,
+        bookingSmsReminder: preferences.bookingSmsReminder ?? false,
+        bookingSmsConfirmation: preferences.bookingSmsConfirmation ?? false,
+        reminderHours: Array.isArray(preferences.reminderHours) ? preferences.reminderHours : [24, 2],
+      })
     }
-  }
+  }, [preferences])
+
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      const res = await apiFetch('/api/user/preferences', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-
-      if (res.ok) {
-        toast.success('Booking notification preferences saved')
-      } else {
-        const err = await res.json().catch(() => ({}))
-        toast.error(err.error?.message || 'Failed to save preferences')
-      }
+      await updatePreferences(data)
+      toast.success('Booking notification preferences saved')
     } catch (err) {
       console.error('Save preferences error:', err)
-      toast.error('Failed to save preferences')
+      toast.error(err instanceof Error ? err.message : 'Failed to save preferences')
     } finally {
       setSaving(false)
     }
+  }
+
+  if (loading || preferencesLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      </div>
+    )
+  }
+
+  if (preferencesError) {
+    return (
+      <div className="text-sm text-red-600 p-4 bg-red-50 rounded">
+        {preferencesError instanceof Error ? preferencesError.message : 'Failed to load preferences'}
+        <button onClick={refetch} className="ml-2 underline hover:no-underline">
+          Retry
+        </button>
+      </div>
+    )
   }
 
   const toggleReminderHour = (hour: number) => {
