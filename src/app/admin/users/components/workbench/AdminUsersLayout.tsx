@@ -3,12 +3,14 @@
 import React, { useState, useMemo } from 'react'
 import { QuickActionsBar } from '../QuickActionsBar'
 import { ImportWizard } from '../ImportWizard'
+import { CreateUserModal } from '@/components/admin/shared/CreateUserModal'
 import OverviewCards from './OverviewCards'
 import AdminSidebar from './AdminSidebar'
 import UserDirectorySection from './UserDirectorySection'
 import BulkActionsPanel from './BulkActionsPanel'
 import { BuilderHeaderSlot, BuilderMetricsSlot, BuilderSidebarSlot, BuilderFooterSlot } from './BuilderSlots'
 import { useIsBuilderEnabled } from '@/hooks/useIsBuilderEnabled'
+import { useUsersContext } from '../../contexts/UsersContextProvider'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import '../styles/admin-users-layout.css'
@@ -21,7 +23,7 @@ import '../styles/admin-users-layout.css'
  * │        Sticky Header: QuickActionsBar        │
  * ├──────────────┬─────────────────��───────���──┤
  * │              │                            │
- * │   Sidebar    │     Main Content Area      │
+ * ��   Sidebar    │     Main Content Area      │
  * │  (Analytics  │   ┌──────────────────��    │
  * │  + Filters)  │   │   OverviewCards  │    │
  * │              │   ├──────────────────┤    │
