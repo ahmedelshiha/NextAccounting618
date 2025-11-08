@@ -186,9 +186,24 @@ const UserRow = memo(function UserRow({
             <DropdownMenuItem onClick={() => setIsEditing(true)}>
               Edit Name
             </DropdownMenuItem>
-            <DropdownMenuItem>Reset Password</DropdownMenuItem>
-            <DropdownMenuItem>Change Role</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem onClick={() => onResetPassword?.(user.email || '')}>
+              Reset Password
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={async () => {
+              const roles = ['ADMIN','EDITOR','VIEWER','TEAM_LEAD','TEAM_MEMBER','STAFF','CLIENT']
+              const current = user.role || 'VIEWER'
+              const choice = window.prompt(`Change role for ${user.name} (current: ${current}). Enter one of: ${roles.join(',')}`)
+              if (!choice) return
+              const trimmed = choice.trim().toUpperCase()
+              if (!roles.includes(trimmed)) { alert('Invalid role'); return }
+              try { await onRoleChange?.(user.id, trimmed as any) } catch (e) { console.error(e); alert('Failed to update role') }
+            }}>
+              Change Role
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600" onClick={async () => {
+              if (!confirm(`Delete ${user.name || user.email}? This cannot be undone.`)) return
+              try { await onDeleteUser?.(user.id) } catch (e) { console.error(e); alert('Failed to delete user') }
+            }}>
               Delete User
             </DropdownMenuItem>
           </DropdownMenuContent>
