@@ -60,11 +60,15 @@ export function UserDirectoryFilterBarEnhanced({
   selectedCount,
   totalCount,
   filteredCount,
+  filteredUsers = [],
+  allUsers = [],
+  selectedUserIds,
   onSelectAll,
   roleOptions = DEFAULT_ROLE_OPTIONS,
   statusOptions = DEFAULT_STATUS_OPTIONS,
   onClearFilters,
-  multiSelect = true
+  multiSelect = true,
+  showExport = true
 }: UserDirectoryFilterBarEnhancedProps) {
   const hasActiveFilters = !!(
     filters.search || 
