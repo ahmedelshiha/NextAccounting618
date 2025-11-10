@@ -163,6 +163,7 @@ model FilterPreset {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   shares        PresetShare[]
+  exportSchedules ExportSchedule[]
 
   @@unique([userId, tenantId, name])
   @@index([tenantId, userId])
