@@ -172,7 +172,7 @@ export function UserDirectoryFilterBarEnhanced({
     <div className="sticky top-0 z-20 bg-white border-b border-gray-200">
       {/* Main filter row */}
       <div
-        className="grid grid-cols-[40px_minmax(180px,2fr)_1fr_1fr_auto_auto] gap-3 p-3 items-center"
+        className="grid grid-cols-[40px_minmax(180px,2fr)_1fr_1fr_auto_auto_auto_auto] gap-3 p-3 items-center"
         role="toolbar"
         aria-label="User directory filters"
       >
