@@ -18,17 +18,17 @@ interface AdminSidebarProps {
 }
 
 /**
- * Left sidebar with filters, analytics, and widgets
- * 
+ * Left sidebar with analytics and widgets
+ *
  * Features:
- * - Collapsible filter sections
- * - Role and status filters
+ * - Collapsible analytics sections
  * - Analytics widgets (charts, stats)
  * - Recent activity list
  * - Responsive drawer on mobile/tablet
+ *
+ * Note: Filters have been moved to the main filter bar in the header
  */
 export default function AdminSidebar({
-  onFilterChange,
   onClose
 }: AdminSidebarProps) {
   const context = useUsersContext()
