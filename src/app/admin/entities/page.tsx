@@ -88,7 +88,7 @@ export default function EntitiesPage() {
               Manage business entities and tax registrations
             </p>
           </div>
-          <PermissionGate permission="entity:create">
+          <PermissionGate permission="USERS_MANAGE">
             <Link href="/admin/entities/new">
               <Button className="gap-2">
                 <Plus className="w-4 h-4" />
