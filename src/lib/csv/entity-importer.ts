@@ -171,7 +171,7 @@ export async function processCsvImport(
   invalidRows: number;
 }> {
   // Import CSV job utilities
-  const { initializeImportJob } = await import('./csv-import-job');
+  const { initializeImportJob } = await import('@/lib/jobs/csv-import');
 
   // Validate CSV
   const validation = await validateCsvData(csvContent);
