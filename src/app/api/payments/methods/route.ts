@@ -136,7 +136,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       expiryMonth = stripePaymentMethod.card.exp_month
       expiryYear = stripePaymentMethod.card.exp_year
     } else if (stripePaymentMethod.us_bank_account) {
-      last4 = stripePaymentMethod.us_bank_account.last4
+      last4 = stripePaymentMethod.us_bank_account.last4 ?? ''
       brand = 'bank_account'
     }
 
