@@ -2,9 +2,9 @@ import { z } from 'zod'
 
 export const OrgGeneralSchema = z.object({
   name: z.string().min(1).max(120),
-  tagline: z.string().max(200).optional().default(''),
-  description: z.string().max(2000).optional().default(''),
-  industry: z.string().max(120).optional().default('')
+  tagline: z.string().max(200).default(''),
+  description: z.string().max(2000).default(''),
+  industry: z.string().max(120).default('')
 })
 
 export const OrgContactSchema = z.object({
