@@ -131,8 +131,9 @@ const _api_DELETE = async (
   try {
     const ctx = requireTenantContext();
     const userId = ctx.userId;
+    const tenantId = ctx.tenantId;
 
-    if (!userId) {
+    if (!userId || !tenantId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -144,10 +145,10 @@ const _api_DELETE = async (
 
     if (permanent) {
       // Hard delete (requires archived status)
-      await entityService.deleteEntity(ctx.tenantId!, params.id, userId);
+      await entityService.deleteEntity(tenantId, params.id, userId);
     } else {
       // Soft delete (archive)
-      await entityService.archiveEntity(ctx.tenantId!, params.id, userId);
+      await entityService.archiveEntity(tenantId, params.id, userId);
     }
 
     logger.info("Entity deleted/archived successfully", {

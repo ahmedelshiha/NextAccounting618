@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withTenantContext } from "@/lib/api-wrapper";
 import { requireTenantContext } from "@/lib/tenant-utils";
 import { entityService } from "@/services/entities";
@@ -15,8 +16,9 @@ const _api_GET = async (
   try {
     const ctx = requireTenantContext();
     const userId = ctx.userId;
+    const tenantId = ctx.tenantId;
 
-    if (!userId) {
+    if (!userId || !tenantId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -30,7 +32,7 @@ const _api_GET = async (
 
     // Get audit history
     const history = await entityService.getAuditHistory(
-      ctx.tenantId!,
+      tenantId,
       params.id,
       limit
     );
